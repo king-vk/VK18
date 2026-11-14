@@ -1,0 +1,49 @@
+R0:
+enable
+configure terminal
+interface <LAN-interface>
+ip address 192.168.1.1 255.255.255.0
+no shutdown
+exit
+interface <R0-R1-interface>
+ip address 10.0.0.1 255.255.255.252
+no shutdown
+exit
+router rip
+version 2
+network 192.168.1.0
+network 10.0.0.0
+no auto-summary
+end
+
+R1:
+enable
+configure terminal
+interface <LAN-interface>
+ip address 192.168.2.1 255.255.255.0
+no shutdown
+exit
+interface <R0-R1-interface>
+ip address 10.0.0.2 255.255.255.252
+no shutdown
+exit
+router rip
+version 2
+network 192.168.2.0
+network 10.0.0.0
+no auto-summary
+end
+
+Verify:
+show ip route
+show ip protocols
+ping 192.168.2.10
+Compile / Run:
+Use Cisco Packet Tracer.
+Sample Output:
+R0# show ip route
+R 192.168.2.0/24 [120/1] via 10.0.0.2
+
+R0# show ip protocols
+Routing Protocol is "rip"
+Version 2
