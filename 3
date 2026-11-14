@@ -1,0 +1,217 @@
+TCP CHAT SERVER — tcp_server.c
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main()
+{
+    int server_fd, client_fd;
+    char buffer[1024];
+    struct sockaddr_in addr;
+
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(8080);
+    addr.sin_addr.s_addr = INADDR_ANY;
+
+    bind(server_fd, (struct sockaddr*)&addr, sizeof(addr));
+    listen(server_fd, 5);
+
+    printf("TCP Server waiting...\n");
+
+    client_fd = accept(server_fd, NULL, NULL);
+    printf("Client connected.\n");
+
+    while (1)
+    {
+        memset(buffer, 0, sizeof(buffer));
+        recv(client_fd, buffer, sizeof(buffer)-1, 0);
+
+        if (strcmp(buffer, "exit") == 0)
+            break;
+
+        printf("Client: %s\n", buffer);
+
+        printf("Server: ");
+        fgets(buffer, sizeof(buffer), stdin);
+        buffer[strcspn(buffer, "\n")] = 0;
+
+        send(client_fd, buffer, strlen(buffer)+1, 0);
+
+        if (strcmp(buffer, "exit") == 0)
+            break;
+    }
+
+    close(client_fd);
+    close(server_fd);
+    return 0;
+}
+
+TCP CHAT CLIENT — tcp_client.c
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main()
+{
+    int sock;
+    char buffer[1024];
+    struct sockaddr_in server;
+
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+
+    server.sin_family = AF_INET;
+    server.sin_port = htons(8080);
+    server.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    connect(sock, (struct sockaddr*)&server, sizeof(server));
+
+    while (1)
+    {
+        printf("You: ");
+        fgets(buffer, sizeof(buffer), stdin);
+        buffer[strcspn(buffer, "\n")] = 0;
+
+        send(sock, buffer, strlen(buffer)+1, 0);
+
+        if (strcmp(buffer, "exit") == 0)
+            break;
+
+        memset(buffer, 0, sizeof(buffer));
+        recv(sock, buffer, sizeof(buffer)-1, 0);
+        printf("Server: %s\n", buffer);
+
+        if (strcmp(buffer, "exit") == 0)
+            break;
+    }
+
+    close(sock);
+    return 0;
+}
+
+UDP CHAT SERVER — udp_server.c
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main()
+{
+    int sock;
+    char buffer[1024];
+    struct sockaddr_in server, client;
+    socklen_t len = sizeof(client);
+
+    sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+    server.sin_family = AF_INET;
+    server.sin_port = htons(8081);
+    server.sin_addr.s_addr = INADDR_ANY;
+
+    bind(sock, (struct sockaddr*)&server, sizeof(server));
+
+    printf("UDP Server waiting...\n");
+
+    while (1)
+    {
+        memset(buffer, 0, sizeof(buffer));
+
+        recvfrom(sock, buffer, sizeof(buffer)-1, 0,
+                 (struct sockaddr*)&client, &len);
+
+        printf("Client: %s\n", buffer);
+
+        if (strcmp(buffer, "exit") == 0)
+            break;
+
+        printf("Server: ");
+        fgets(buffer, sizeof(buffer), stdin);
+        buffer[strcspn(buffer, "\n")] = 0;
+
+        sendto(sock, buffer, strlen(buffer)+1, 0,
+               (struct sockaddr*)&client, len);
+
+        if (strcmp(buffer, "exit") == 0)
+            break;
+    }
+
+    close(sock);
+    return 0;
+}
+
+UDP CHAT CLIENT — udp_client.c
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main()
+{
+    int sock;
+    char buffer[1024];
+    struct sockaddr_in server;
+    socklen_t len = sizeof(server);
+
+    sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+    server.sin_family = AF_INET;
+    server.sin_port = htons(8081);
+    server.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    while (1)
+    {
+        printf("You: ");
+        fgets(buffer, sizeof(buffer), stdin);
+        buffer[strcspn(buffer, "\n")] = 0;
+
+        sendto(sock, buffer, strlen(buffer)+1, 0,
+               (struct sockaddr*)&server, len);
+
+        if (strcmp(buffer, "exit") == 0)
+            break;
+
+        memset(buffer, 0, sizeof(buffer));
+
+        recvfrom(sock, buffer, sizeof(buffer)-1, 0,
+                 NULL, NULL);
+
+        printf("Server: %s\n", buffer);
+
+        if (strcmp(buffer, "exit") == 0)
+            break;
+    }
+
+    close(sock);
+    return 0;
+}
+Compile / Run:
+gcc tcp_server.c -o tcp_server
+gcc tcp_client.c -o tcp_client
+
+Terminal 1:
+./tcp_server
+
+Terminal 2:
+./tcp_client
+
+For UDP:
+gcc udp_server.c -o udp_server
+gcc udp_client.c -o udp_client
+./udp_server
+./udp_client
+Sample Output:
+TCP Server waiting...
+Client connected.
+Client: Hello Server
+Server: Hello Client
+
+Client:
+You: Hello Server
+Server: Hello Client
+
+File transfer:
+File sent successfully.
+File received successfully.
