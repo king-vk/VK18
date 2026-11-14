@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main()
+{
+    int s,c;
+    char req[2048];
+    struct sockaddr_in a;
+
+    s=socket(AF_INET,SOCK_STREAM,0);
+
+    a.sin_family=AF_INET;
+    a.sin_port=htons(8084);
+    a.sin_addr.s_addr=INADDR_ANY;
+
+    bind(s,(struct sockaddr*)&a,sizeof(a));
+    listen(s,5);
+
+    printf("HTTP server: http://127.0.0.1:8084\n");
+
+    while(1)
+    {
+        c=accept(s,NULL,NULL);
+        memset(req,0,sizeof(req));
+        recv(c,req,sizeof(req)-1,0);
+
+        char response[] =
+            "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
+            "<html><body><h1>Computer Networks Lab</h1>"
+            "<p>Hello from C HTTP server.</p></body></html>";
+
+        send(c,response,strlen(response),0);
+        close(c);
+    }
+}
+gcc http_server.c -o http_server
+./http_server
+HTTP server: http://127.0.0.1:8084
+
+Browser:
+Computer Networks Lab
+Hello from C HTTP server.
