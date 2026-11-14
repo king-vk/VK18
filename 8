@@ -1,0 +1,37 @@
+Devices:
+2 PCs, 1 Switch, 1 Server, 1 Printer
+
+IP:
+PC0 = 192.168.1.10 /24
+PC1 = 192.168.1.20 /24
+Server = 192.168.1.100 /24
+Printer = 192.168.1.50 /24
+
+Server -> Services -> FTP -> On.
+Create an FTP username and password.
+
+From PC Command Prompt:
+ftp 192.168.1.100
+dir
+get filename
+put filename
+quit
+
+Test:
+ping 192.168.1.50
+
+Save:
+Exp8_LAN_FTP_Printer.pkt
+Compile / Run:
+Use Cisco Packet Tracer.
+Sample Output:
+PC0> ftp 192.168.1.100
+Connected to 192.168.1.100.
+Name: student
+Password: ****
+ftp> dir
+ftp> get test.txt
+ftp> quit
+
+PC0> ping 192.168.1.50
+Reply from 192.168.1.50: bytes=32 time<1ms TTL=128
