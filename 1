@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <string.h>
+void divide(char data[], const char divisor[], char remainder[])
+{
+    int n = strlen(data), m = strlen(divisor);
+    char temp[200];
+    strcpy(temp, data);
+
+    for (int i = 0; i <= n - m; i++)
+        if (temp[i] == '1')
+            for (int j = 0; j < m; j++)
+                temp[i+j] = (temp[i+j] == divisor[j]) ? '0' : '1';
+
+    strcpy(remainder, temp + n - m + 1);
+}
+
+int main()
+{
+    char data[100], divisor[50], appended[200], rem[50];
+
+    printf("Enter data bits: ");
+    scanf("%99s", data);
+
+    printf("Enter generator/divisor bits: ");
+    scanf("%49s", divisor);
+
+    strcpy(appended, data);
+
+    for (int i = 0; i < (int)strlen(divisor)-1; i++)
+        strcat(appended, "0");
+
+    divide(appended, divisor, rem);
+
+    printf("CRC: %s\n", rem);
+
+    strcat(data, rem);
+    printf("Transmitted frame: %s\n", data);
+
+    return 0;
+}
+output:
+gcc 01_crc.c -o crc
+./crc
+Enter data bits: 1101011011
+Enter generator/divisor bits: 10011
+CRC: 1110
+Transmitted frame: 11010110111110
