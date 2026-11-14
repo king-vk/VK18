@@ -1,0 +1,56 @@
+Topology:
+PC0 -- SW0 -- R0 -- R1 -- SW1 -- PC1
+
+PC0:
+IP 192.168.1.10
+Mask 255.255.255.0
+Gateway 192.168.1.1
+
+R0 LAN:
+192.168.1.1/24
+
+R0-R1:
+R0 = 10.0.0.1/30
+R1 = 10.0.0.2/30
+
+R1 LAN:
+192.168.2.1/24
+
+PC1:
+IP 192.168.2.10
+Mask 255.255.255.0
+Gateway 192.168.2.1
+
+STATIC ROUTES
+
+R0:
+ip route 192.168.2.0 255.255.255.0 10.0.0.2
+
+R1:
+ip route 192.168.1.0 255.255.255.0 10.0.0.1
+
+RIP VERSION 2
+
+router rip
+version 2
+network 192.168.1.0
+network 10.0.0.0
+no auto-summary
+
+On R1 use its LAN network:
+network 192.168.2.0
+network 10.0.0.0
+no auto-summary
+
+Verify:
+show ip route
+show ip protocols
+ping 192.168.2.10
+Compile / Run:
+Use Cisco Packet Tracer.
+Sample Output:
+R0# show ip route
+R 192.168.2.0/24 [120/1] via 10.0.0.2
+
+PC0> ping 192.168.2.10
+Success rate is 100 percent (4/4)
