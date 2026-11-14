@@ -1,0 +1,82 @@
+DNS SERVER — dns_server.c
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main()
+{
+    int s,c;
+    char domain[100], ip[100];
+    struct sockaddr_in a;
+
+    s=socket(AF_INET,SOCK_STREAM,0);
+
+    a.sin_family=AF_INET;
+    a.sin_port=htons(9090);
+    a.sin_addr.s_addr=INADDR_ANY;
+
+    bind(s,(struct sockaddr*)&a,sizeof(a));
+    listen(s,5);
+
+    printf("DNS Server waiting...\n");
+
+    while(1)
+    {
+        c=accept(s,NULL,NULL);
+
+        memset(domain,0,sizeof(domain));
+        recv(c,domain,sizeof(domain)-1,0);
+
+        if(strcmp(domain,"google.com")==0)
+            strcpy(ip,"142.250.183.14");
+        else if(strcmp(domain,"example.com")==0)
+            strcpy(ip,"93.184.216.34");
+        else if(strcmp(domain,"localhost")==0)
+            strcpy(ip,"127.0.0.1");
+        else
+            strcpy(ip,"Domain not found");
+
+        send(c,ip,strlen(ip)+1,0);
+        close(c);
+    }
+}
+
+DNS CLIENT — dns_client.c
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main()
+{
+    int s;
+    char domain[100], ip[100];
+    struct sockaddr_in server;
+
+    s=socket(AF_INET,SOCK_STREAM,0);
+
+    server.sin_family=AF_INET;
+    server.sin_port=htons(9090);
+    server.sin_addr.s_addr=inet_addr("127.0.0.1");
+
+    connect(s,(struct sockaddr*)&server,sizeof(server));
+
+    printf("Enter domain name: ");
+    scanf("%99s",domain);
+
+    send(s,domain,strlen(domain)+1,0);
+    recv(s,ip,sizeof(ip)-1,0);
+
+    printf("IP address: %s\n",ip);
+
+    close(s);
+    return 0;
+}
+gcc dns_server.c -o dns_server
+gcc dns_client.c -o dns_client
+Terminal 1: ./dns_server
+Terminal 2: ./dns_client
+DNS Server waiting...
+Enter domain name: google.com
+IP address: 142.250.183.14
