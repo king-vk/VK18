@@ -1,0 +1,49 @@
+#include <stdio.h>
+
+int main()
+{
+    int n, i, ack;
+
+    printf("Enter number of frames: ");
+    scanf("%d", &n);
+
+    for (i=1; i<=n; i++)
+    {
+        printf("\nSender: Sending Frame %d\n", i);
+        printf("Enter ACK (1 = received, 0 = lost): ");
+        scanf("%d", &ack);
+
+        if (ack == 1)
+            printf("Receiver: ACK %d received.\n", i);
+        else
+        {
+            printf("Receiver: Frame %d lost.\n", i);
+            printf("Sender: Retransmitting Frame %d...\n", i);
+            printf("Receiver: ACK %d received.\n", i);
+        }
+    }
+
+    printf("\nAll frames transmitted successfully.\n");
+    return 0;
+}
+Compile / Run:
+gcc 11_stop_wait_arq.c -o stopwait
+./stopwait
+Sample Output:
+Enter number of frames: 3
+
+Sender: Sending Frame 1
+Enter ACK (1 = received, 0 = lost): 1
+Receiver: ACK 1 received.
+
+Sender: Sending Frame 2
+Enter ACK (1 = received, 0 = lost): 0
+Receiver: Frame 2 lost.
+Sender: Retransmitting Frame 2...
+Receiver: ACK 2 received.
+
+Sender: Sending Frame 3
+Enter ACK (1 = received, 0 = lost): 1
+Receiver: ACK 3 received.
+
+All frames transmitted successfully.
