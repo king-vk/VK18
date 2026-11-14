@@ -1,0 +1,25 @@
+Ubuntu:
+ip addr
+ip route
+ping -c 4 127.0.0.1
+ping -c 4 8.8.8.8
+sudo apt update
+sudo apt install traceroute
+traceroute 8.8.8.8
+ss -tuln
+sudo apt install net-tools
+netstat -an
+
+Windows:
+ipconfig
+ping
+tracert
+netstat
+Compile / Run:
+Execute each command in Ubuntu Terminal or Windows Command Prompt.
+Sample Output:
+$ ping -c 4 127.0.0.1
+4 packets transmitted, 4 received, 0% packet loss
+
+$ ip route
+default via <gateway> dev <interface>
